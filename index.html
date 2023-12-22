@@ -37,6 +37,13 @@
         <div id="game">
             <header>
                 <h1 class="title">Wordle-PP</h1>
+                <div class="hard-mode-toggle">
+                  <label class="switch">
+                      <input type="checkbox" id="hardMode" onchange="toggleHardMode()">
+                      <span class="slider round"></span>
+                  </label>
+                  <span>Hard Mode</span>
+                </div>
             </header>
             <div id="board-container">
                 <div id="wordGrid">

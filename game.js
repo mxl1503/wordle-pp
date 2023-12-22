@@ -1,6 +1,12 @@
 Module.onRuntimeInitialized = async _ => {
   let targetWordPtr = Module._createNewGame();
   let targetWord = Module.UTF8ToString(targetWordPtr);
+  let hardMode = false;
+
+  function toggleHardMode() {
+    hardMode = true;
+    resetGame()
+  }
   console.log(targetWord);
 
   let currentWord = '';
@@ -106,11 +112,6 @@ Module.onRuntimeInitialized = async _ => {
       key.style.backgroundColor = '#ddd'; // Reset color or other styles
     });
   }
-
-  // Allow the handleKey function to be accesssed globally
-  window.handleKey = handleKey;
-  window.closePopUp = closePopUp;
-  window.resetGame = resetGame;
   
   function updateGridColours(feedbackString) {
     let index = 0;
@@ -149,8 +150,7 @@ Module.onRuntimeInitialized = async _ => {
         keyElement.classList.add('absent');
       }
     }
-}
-
+  }
 
   // Function that returns a string based on input character
   function getColorFromFeedback(char) {
@@ -198,5 +198,10 @@ Module.onRuntimeInitialized = async _ => {
     console.log(key);
     handleKey(key);
   });
-};
 
+  // Allow functions to be accessed globally
+  window.handleKey = handleKey;
+  window.closePopUp = closePopUp;
+  window.resetGame = resetGame;
+  window.toggleHardMode = toggleHardMode;
+};

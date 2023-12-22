@@ -159,3 +159,75 @@ header {
 .popup-content h2 {
   margin-top: 0;
 }
+
+/* The switch - the box around the slider */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px; /* Width of the switch */
+  height: 34px; /* Height of the switch */
+}
+
+/* Hide default checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px; /* Height of the circle */
+  width: 26px; /* Width of the circle */
+  left: 4px; /* Initial left alignment */
+  bottom: 4px; /* Align to the bottom, with a slight gap */
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+  border-radius: 50%; /* Make it a circle */
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(16px); /* Adjust this value if the circle goes too far */
+  -ms-transform: translateX(16px);
+  transform: translateX(16px); /* Adjust this value if the circle goes too far */
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+.hard-mode-toggle {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.hard-mode-toggle span {
+    margin-left: 10px;
+    color: white;
+}
