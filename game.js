@@ -1,6 +1,6 @@
 Module.onRuntimeInitialized = async _ => {
-  const targetWordPtr = Module._createNewGame();
-  const targetWord = Module.UTF8ToString(targetWordPtr);
+  let targetWordPtr = Module._createNewGame();
+  let targetWord = Module.UTF8ToString(targetWordPtr);
   console.log(targetWord);
 
   let currentWord = '';
@@ -8,6 +8,7 @@ Module.onRuntimeInitialized = async _ => {
 
   // Function to handle keyboard inputs
   function handleKey(key) {
+    let gameWon = false;
     if (key === 'Backspace') {
       // Handle Backspace key to remove the last character from the current word
       currentWord = currentWord.slice(0, -1);
@@ -22,16 +23,25 @@ Module.onRuntimeInitialized = async _ => {
         // accordingly
         const targetWordCPP = Module._malloc(targetWord.length + 1);
         Module.stringToUTF8(targetWord.toLowerCase(), targetWordCPP, targetWord.length + 1);
+
         const feedbackPtr = Module._makeGuess(currentWordCPP, targetWordCPP);
         const feedback = Module.UTF8ToString(feedbackPtr);
+        if (feedback === 'GGGGG') {
+          gameWon = true;
+        }
+
+        // Update grid and keyboard colours
         updateGridColours(feedback);
         updateKeyboard(feedback, currentWord);
+
         // Free strings
         Module._free(feedbackPtr);
         Module._free(targetWordCPP);
         
-        currentWord = '';
-        wordsSubmitted++;
+        if (!gameWon) {
+          currentWord = '';
+          wordsSubmitted++;
+        }
       } else {
         // Invalid word, show the invalid word popup
         showInvalidWordPopup();
@@ -45,11 +55,62 @@ Module.onRuntimeInitialized = async _ => {
     }
 
     // Update the display with the current word
-    updateDisplay(currentWord);
+    if (gameWon) {
+      showVictoryPopUp();
+    } else if (wordsSubmitted >= 6) {
+      showDefeatPopUp();
+    } else {
+      updateDisplay(currentWord);
+    }
+  }
+
+  function showVictoryPopUp() {
+    document.getElementById('victory-popup').style.display = 'flex';
+  }
+
+  function showDefeatPopUp() {
+    document.getElementById('defeat-popup').style.display = 'flex';
+  }
+
+  function closePopUp(popupId) {
+    document.getElementById(popupId).style.display = 'none';
+  }
+
+  function resetGame() {
+    // Close any open popups
+    closePopUp('victory-popup');
+    closePopUp('defeat-popup');
+
+    // Reset game state variables
+    wordsSubmitted = 0;
+    currentWord = '';
+
+    targetWordPtr = Module._createNewGame();
+    targetWord = Module.UTF8ToString(targetWordPtr);
+    console.log(targetWord);
+
+    // Clear the game board
+    // Assuming each cell has an ID like 'cell-0-0', 'cell-0-1', etc.
+    for (let row = 0; row < 6; row++) {
+      for (let col = 0; col < 5; col++) {
+        const cell = document.getElementById(`cell-${row}-${col}`);
+        cell.innerText = '';
+        cell.style.backgroundColor = 'darkgray'; // Reset color or other styles
+      }
+    }
+
+    // Reset the keyboard (if needed)
+    // Assuming each key has an ID like 'key-Q', 'key-W', etc.
+    const keys = document.querySelectorAll('.keyboard-key');
+    keys.forEach(key => {
+      key.style.backgroundColor = '#ddd'; // Reset color or other styles
+    });
   }
 
   // Allow the handleKey function to be accesssed globally
   window.handleKey = handleKey;
+  window.closePopUp = closePopUp;
+  window.resetGame = resetGame;
   
   function updateGridColours(feedbackString) {
     let index = 0;

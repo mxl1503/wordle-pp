@@ -123,6 +123,26 @@
             </div>
         </div>
     </div>
+    <!-- Victory Popup -->
+    <div id="victory-popup" class="popup-end-container" style="display:none;">
+      <div class="popup-content">
+          <h2>You Win!</h2>
+          <p>Congratulations, you guessed the word!</p>
+          <button onclick="closePopUp('victory-popup')">Close</button>
+          <button onclick="resetGame()">Play Again</button>
+      </div>
+    </div>
+
+    <!-- Defeat Popup -->
+    <div id="defeat-popup" class="popup-end-container" style="display:none;">
+      <div class="popup-content">
+          <h2>Game Over</h2>
+          <p>Sorry, you didn't guess the word.</p>
+          <button onclick="closePopUp('defeat-popup')">Close</button>
+        <button onclick="resetGame()">Try Again</button>
+      </div>
+    </div>
+
     <!-- Your JavaScript file -->
     <script src="wordle.js"></script>
     <script type="module" src="game.js"></script>
