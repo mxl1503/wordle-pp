@@ -1,0 +1,126 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+  font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+    "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+}
+
+#popup-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0);
+  z-index: 999; /* Ensure it's above other elements */
+  display: none; /* Initially hidden */
+}
+
+#popup-message {
+  background-color: #ff0000; /* Red background color */
+  color: #ffffff; /* White text color */
+  padding: 10px 20px;
+  border-radius: 5px;
+  animation: fadeOut 2s ease-in-out forwards; /* Fade out animation */
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    display: none; /* Hide after fading out */
+  }
+}
+
+#container {
+  display: flex;
+  background-color: rgb(18, 18, 19);
+  height: 100%;
+  align-items: center;
+  flex-direction: column;
+}
+
+#game {
+  width: 100%;
+  max-width: 500px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  border-bottom: 1px solid rgb(58, 58, 60);
+}
+
+.title {
+  color: gainsboro;
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin: 0.4rem 0 0.4rem 0;
+  text-align: center;
+  font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+    "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+}
+
+#board-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-grow: 1;
+  overflow: hidden;
+}
+
+#keyboard-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.keyboard-row {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 6px;
+}
+
+.keyboard-key {
+  padding: 15px 20px; /* Increase padding for larger buttons */
+  margin: 0 3px; /* Consistent margin between keys */
+  background-color: #ddd; /* Default key color */
+  border: none;
+  border-radius: 6px;
+  font-size: 1.2rem; /* Larger font size for the key labels */
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.wide-button {
+  padding: 15px 36px; /* Larger padding for wide buttons */
+  margin-right: 3px; /* Adjust if necessary for alignment */
+}
+
+.flip-animation {
+  animation: flip 0.8s forwards;
+}
+
+@keyframes flip {
+  0% {
+    transform: rotateX(0);
+  }
+  50% {
+    transform: rotateX(90deg);
+  }
+  100% {
+    transform: rotateX(0);
+  }
+}
