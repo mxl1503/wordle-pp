@@ -124,3 +124,15 @@ header {
     transform: rotateX(0);
   }
 }
+
+.correct {
+  background-color: rgb(106, 169, 100);
+}
+
+.present {
+  background-color: yellow;
+}
+
+.absent {
+  background-color: rgb(120, 124, 126);
+}

@@ -25,7 +25,7 @@ Module.onRuntimeInitialized = async _ => {
         const feedbackPtr = Module._makeGuess(currentWordCPP, targetWordCPP);
         const feedback = Module.UTF8ToString(feedbackPtr);
         updateGridColours(feedback);
-
+        updateKeyboard(feedback, currentWord);
         // Free strings
         Module._free(feedbackPtr);
         Module._free(targetWordCPP);
@@ -35,7 +35,6 @@ Module.onRuntimeInitialized = async _ => {
       } else {
         // Invalid word, show the invalid word popup
         showInvalidWordPopup();
-        console.log('running');
       }
 
       // Free string
@@ -74,6 +73,23 @@ Module.onRuntimeInitialized = async _ => {
       index++;
     }
   }
+
+  function updateKeyboard(feedback, guess) {
+    for (let i = 0; i < guess.length; i++) {
+      const letter = guess[i];
+      const feedbackChar = feedback[i];
+      const keyElement = document.getElementById(`key-${letter.toUpperCase()}`);
+
+      if (feedbackChar === 'G') {
+        keyElement.classList.add('correct');
+      } else if (feedbackChar === 'Y') {
+        keyElement.classList.add('present');
+      } else if (feedbackChar === 'B') {
+        keyElement.classList.add('absent');
+      }
+    }
+}
+
 
   // Function that returns a string based on input character
   function getColorFromFeedback(char) {
