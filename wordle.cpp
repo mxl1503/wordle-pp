@@ -81,3 +81,14 @@ bool validateGuess(const char* guess) {
     return !!std::binary_search(guessList.begin(), guessList.end(), guess);
 }
 }
+
+/*
+hard mode planning
+
+for a guess, calculate the string of GBY that eliminates
+the least solution.
+makeGuess -> for each combination of GBY 3^5 = 243 possibilities
+for each possibility, calculate number of possible answers remaining
+return string with worst possible answer
+
+*/ 
