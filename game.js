@@ -2,11 +2,16 @@ Module.onRuntimeInitialized = async _ => {
   let targetWordPtr = Module._createNewGame();
   let targetWord = Module.UTF8ToString(targetWordPtr);
   let hardMode = false;
-
+  
   function toggleHardMode() {
-    hardMode = true;
+    if (hardMode) {
+      hardMode = false;
+    } else {
+      hardMode = true;
+    }
     resetGame()
   }
+
   console.log(targetWord);
 
   let currentWord = '';
@@ -109,7 +114,7 @@ Module.onRuntimeInitialized = async _ => {
     // Assuming each key has an ID like 'key-Q', 'key-W', etc.
     const keys = document.querySelectorAll('.keyboard-key');
     keys.forEach(key => {
-      key.style.backgroundColor = '#ddd'; // Reset color or other styles
+      key.classList.remove('correct', 'present', 'absent');
     });
   }
   
