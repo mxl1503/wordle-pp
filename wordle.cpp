@@ -5,6 +5,7 @@
 #include <string>
 #include <cstdlib>
 #include <ctime>
+#include <unordered_map>
 
 #include <emscripten.h>
 
@@ -52,14 +53,24 @@ const char *createNewGame(void) {
 
 EMSCRIPTEN_KEEPALIVE
 std::string evaluateGuess(const std::string &guess, const std::string &targetWord) {
-    std::string result;
+    std::string result(guess.length(), 'B');
+    std::unordered_map<char, int> letterCount;
+
+    for (char letter : targetWord) {
+        letterCount[letter]++;
+    }
+
     for (int i = 0; i < guess.length(); ++i) {
         if (guess[i] == targetWord[i]) {
-            result += 'G';
-        } else if (targetWord.find(guess[i]) != std::string::npos) {
-            result += 'Y';
-        } else {
-            result += 'B';
+            result[i] = 'G';
+            letterCount[guess[i]]--;
+        }
+    }
+
+    for (int i = 0; i < guess.length(); ++i) {
+        if (guess[i] != targetWord[i] && letterCount[guess[i]] > 0) {
+            result[i] = 'Y';
+            letterCount[guess[i]]--;
         }
     }
 
