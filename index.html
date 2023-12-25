@@ -22,7 +22,18 @@
                       <span class="slider round"></span>
                   </label>
                   <span>Impossible Mode</span>
+                  <div class="info-icon" onclick="toggleInfoPopup()">?</div>
                 </div>
+                
+                <!-- Info Pop-up -->
+                <div id="info-popup" class="info-popup-container" style="display:none;">
+                    <div class="popup-content">
+                        <h2>Impossible Mode Info</h2>
+                        <p>In Impossible Mode, the game does not pick a single word at the start. Instead, it evaluates your guesses against all possible words and provides the least informative feedback, making it challenging to guess the correct word. Good luck!</p>
+                        <button onclick="toggleInfoPopup()">Close</button>
+                    </div>
+                </div>
+              
             </header>
             <div id="board-container">
                 <div id="wordGrid">

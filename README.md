@@ -25,10 +25,10 @@ This project is a full-stack implementation of Wordle with an added Impossible/H
 
 - Clone the repository to your local machine.
 - Ensure Emscripten SDK is installed and properly set up.
-- Compile the C++ code to WebAssembly using Emscripten (can change the -O1 flag to -O3 for slower compile time but better optimisations).
+- Compile the C++ code to WebAssembly using Emscripten.
 
 ```sh
-em++ -std=c++17 -O1 --preload-file wordLists/answerlist.txt --preload-file wordLists/guesslist.txt wordle.cpp -o wordle.js -s WASM=1 \
+em++ -std=c++17 -O3 --preload-file wordLists/answerlist.txt --preload-file wordLists/guesslist.txt wordle.cpp -o wordle.js -s WASM=1 \
 -s EXPORTED_FUNCTIONS='["_getAnswerList", "_getGuessList", "_createNewGame", "_makeGuess", "_evaluateGuess", "_validateGuess", "_isMatch", "_filterAnswerList", "_findWorstFeedback", "_makeHardModeGuess", "_free", "_malloc"]' \
 -s EXPORTED_RUNTIME_METHODS='["ccall", "cwrap", "UTF8ToString", "stringToUTF8", "setValue"]'
 ```

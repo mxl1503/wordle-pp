@@ -239,6 +239,12 @@ Module.onRuntimeInitialized = async _ => {
     const popup = document.getElementById('popup-container');
     popup.style.display = 'none';
   }
+
+  function toggleInfoPopup() {
+    var popup = document.getElementById("info-popup");
+    popup.style.display = popup.style.display === 'none' ? 'flex' : 'none';
+  }
+
   
   // Event listener for keyboard inputs
   document.addEventListener('keydown', (event) => {
@@ -254,4 +260,5 @@ Module.onRuntimeInitialized = async _ => {
   window.closePopUp = closePopUp;
   window.resetGame = resetGame;
   window.toggleHardMode = toggleHardMode;
+  window.toggleInfoPopup = toggleInfoPopup;
 };
