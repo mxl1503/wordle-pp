@@ -7,11 +7,6 @@
 #include <ctime>
 #include <unordered_map>
 
-#include <emscripten.h>
-
-extern "C" {
-
-EMSCRIPTEN_KEEPALIVE
 std::vector<std::string> getAnswerList(void) {
     std::vector<std::string> answerList;
     std::ifstream answerFile("wordLists/answerlist.txt");
@@ -25,7 +20,6 @@ std::vector<std::string> getAnswerList(void) {
     return answerList;
 }
 
-EMSCRIPTEN_KEEPALIVE
 std::vector<std::string> getGuessList(void) {
     std::vector<std::string> guessList;
     std::ifstream guessFile("wordLists/guesslist.txt");
@@ -39,7 +33,6 @@ std::vector<std::string> getGuessList(void) {
     return guessList;
 }
 
-EMSCRIPTEN_KEEPALIVE
 const char *createNewGame(void) {
     srand(time(NULL));
     std::vector<std::string> answerList = getAnswerList();
@@ -51,7 +44,6 @@ const char *createNewGame(void) {
     return targetWord;
 }
 
-EMSCRIPTEN_KEEPALIVE
 std::string evaluateGuess(const std::string &guess, const std::string &targetWord) {
     std::string result(guess.length(), 'B');
     std::unordered_map<char, int> letterCount;
@@ -77,23 +69,20 @@ std::string evaluateGuess(const std::string &guess, const std::string &targetWor
     return result;
 }
 
-EMSCRIPTEN_KEEPALIVE
-const char* makeGuess(const char *guess, const char *targetWord) {
+const char* makeGuess(const char* guess, const char *targetWord) {
     std::string feedback = evaluateGuess(std::string(guess), std::string(targetWord));
-    char *result = new char[feedback.length() + 1];
+    char* result = new char[feedback.length() + 1];
     strcpy(result, feedback.c_str());
 
     return result;
 }
 
-EMSCRIPTEN_KEEPALIVE
-bool validateGuess(const char *guess) {
+bool validateGuess(const char* guess) {
     std::vector<std::string> guessList = getGuessList();
     return !!std::binary_search(guessList.begin(), guessList.end(), guess);
 }
 
-EMSCRIPTEN_KEEPALIVE
-bool isMatch(const std::string &word, const std::string &guess, const std::string &feedback) {
+bool isMatch(const std::string& word, const std::string& guess, const std::string& feedback) {
     std::unordered_map<char, int> charCount;
     for (char c : word) {
         charCount[c]++;
@@ -124,7 +113,6 @@ bool isMatch(const std::string &word, const std::string &guess, const std::strin
     return true;
 }
 
-EMSCRIPTEN_KEEPALIVE
 std::vector<std::string> filterAnswerList(std::vector<std::string> prevGuesses, std::vector<std::string> prevFeedback) {
     std::vector<std::string> answerList = getAnswerList();
     if (prevGuesses.empty() && prevFeedback.empty()) {
@@ -132,7 +120,7 @@ std::vector<std::string> filterAnswerList(std::vector<std::string> prevGuesses, 
     }
 
     std::vector<std::string> filteredList;
-    for (const auto& word : answerList) {
+    for (const auto &word : answerList) {
         bool matchesAll = true;
         for (int i = 0; i < prevGuesses.size(); ++i) {
             if (!isMatch(word, prevGuesses[i], prevFeedback[i])) {
@@ -146,10 +134,14 @@ std::vector<std::string> filterAnswerList(std::vector<std::string> prevGuesses, 
         }
     }
 
+    for (int i = 0; i < filteredList.size(); ++i) {
+        std::cout << filteredList[i] << std::endl;
+    }
+    
+    std::cout << filteredList.size() << std::endl;
     return filteredList;
 }
 
-EMSCRIPTEN_KEEPALIVE
 std::string findWorstFeedback(std::string &guess, std::vector<std::string> &refinedAnswerList) {
     std::unordered_map<std::string, int> feedbackCount;
 
@@ -172,7 +164,6 @@ std::string findWorstFeedback(std::string &guess, std::vector<std::string> &refi
     return worstFeedback;
 }
 
-EMSCRIPTEN_KEEPALIVE
 const char *makeHardModeGuess(const char **prevGuessesArray, const char **prevFeedbackArray, const char *guess, int arrayLength) {
     std::vector<std::string> prevGuesses;
     std::vector<std::string> prevFeedback;
@@ -192,4 +183,16 @@ const char *makeHardModeGuess(const char **prevGuessesArray, const char **prevFe
     strcpy(feedbackCStr, feedback.c_str());
     return feedbackCStr;
 }
+
+int main() {
+    const char *prevGuessesArray[] = { "salet", "courd" };
+    const char *prevFeedbackArray[] = { "BBBBB", "BYBYB" };
+    const char *currentGuess = "gimpy";
+    int arrayLength = 1;
+
+    const char *feedback = makeHardModeGuess(prevGuessesArray, prevFeedbackArray, currentGuess, arrayLength);
+
+    std::cout << "Feedback for guess '" << currentGuess << "': " << feedback << std::endl;
+
+    return 0;
 }

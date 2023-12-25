@@ -1,7 +1,11 @@
 Module.onRuntimeInitialized = async _ => {
   let targetWordPtr = Module._createNewGame();
   let targetWord = Module.UTF8ToString(targetWordPtr);
+
+  // Relevant to hard mode only
   let hardMode = false;
+  let prevGuesses = [];
+  let prevFeedback = [];
   
   function toggleHardMode() {
     if (hardMode) {
@@ -9,13 +13,43 @@ Module.onRuntimeInitialized = async _ => {
     } else {
       hardMode = true;
     }
-    resetGame()
+
+    resetGame();
   }
 
   console.log(targetWord);
 
   let currentWord = '';
   let wordsSubmitted = 0;
+
+  function allocateStringArray(strings) {
+    const ptrs = strings.map(str => {
+      const buffer = Module._malloc(str.length + 1); // Allocate memory for the string
+      Module.stringToUTF8(str, buffer, str.length + 1); // Copy the string to allocated memory
+      return buffer;
+    });
+
+    const arrayPtr = Module._malloc(ptrs.length * 4); // Allocate memory for the array of pointers
+    ptrs.forEach((ptr, index) => {
+      Module.setValue(arrayPtr + index * 4, ptr, 'i32'); // Set the pointer in the array
+    });
+
+    return [arrayPtr, ptrs];
+  }
+
+  function hardModeGuessHelper(prevGuesses, prevFeedback, currentWordCPP) {
+    const [prevGuessesArrPtr, ptrsOne] = allocateStringArray(prevGuesses);
+    const [prevFeedbackArrPtr, ptrsTwo] = allocateStringArray(prevFeedback);
+
+    const returnVal = Module._makeHardModeGuess(prevGuessesArrPtr, prevFeedbackArrPtr, currentWordCPP, prevGuesses.length);
+
+    ptrsOne.forEach(ptr => Module._free(ptr));
+    ptrsTwo.forEach(ptr => Module._free(ptr));
+    Module._free(prevGuessesArrPtr);
+    Module._free(prevFeedbackArrPtr);
+
+    return returnVal;
+  }
 
   // Function to handle keyboard inputs
   function handleKey(key) {
@@ -34,9 +68,16 @@ Module.onRuntimeInitialized = async _ => {
         // accordingly
         const targetWordCPP = Module._malloc(targetWord.length + 1);
         Module.stringToUTF8(targetWord.toLowerCase(), targetWordCPP, targetWord.length + 1);
-
-        const feedbackPtr = Module._makeGuess(currentWordCPP, targetWordCPP);
+        let feedbackPtr;
+        if (hardMode) {
+          feedbackPtr = hardModeGuessHelper(prevGuesses, prevFeedback, currentWordCPP);
+        } else {
+          feedbackPtr = Module._makeGuess(currentWordCPP, targetWordCPP);
+        }
+      
+        prevGuesses.push(currentWord.toLowerCase());
         const feedback = Module.UTF8ToString(feedbackPtr);
+        prevFeedback.push(feedback);
         if (feedback === 'GGGGG') {
           gameWon = true;
         }
@@ -101,12 +142,11 @@ Module.onRuntimeInitialized = async _ => {
     console.log(targetWord);
 
     // Clear the game board
-    // Assuming each cell has an ID like 'cell-0-0', 'cell-0-1', etc.
     for (let row = 0; row < 6; row++) {
       for (let col = 0; col < 5; col++) {
         const cell = document.getElementById(`cell-${row}-${col}`);
         cell.innerText = '';
-        cell.style.backgroundColor = 'darkgray'; // Reset color or other styles
+        cell.style.backgroundColor = 'darkgray';
       }
     }
 
@@ -116,6 +156,9 @@ Module.onRuntimeInitialized = async _ => {
     keys.forEach(key => {
       key.classList.remove('correct', 'present', 'absent');
     });
+
+    prevGuesses = [];
+    prevFeedback = [];
   }
   
   function updateGridColours(feedbackString) {
@@ -201,7 +244,9 @@ Module.onRuntimeInitialized = async _ => {
   document.addEventListener('keydown', (event) => {
     const key = event.key;
     console.log(key);
-    handleKey(key);
+    if (key === 'Backspace' || key == 'Enter' || /^[A-Z]$/i.test(key)) {
+      handleKey(key);
+    }
   });
 
   // Allow functions to be accessed globally
