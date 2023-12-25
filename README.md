@@ -62,7 +62,7 @@ The Impossible/Hard mode dynamically adjusts the difficulty of the game. In this
 ## Acknowledgements
 
 Project inspired by the following sources:
-- Worlde (https://www.nytimes.com/games/wordle/index.html)
-- Solving Wordle using information theory by 3B1B (https://www.youtube.com/watch?v=v68zYyaEmEA)
-- Optimal Wordle Solutions by Jonathon Olsen (https://jonathanolson.net/experiments/optimal-wordle-solutions)
-- Wordle-solving state of the art: all optimality results so far by Laurent Poirrier (https://www.poirrier.ca/notes/wordle-optimal/)
+- **Worlde** (https://www.nytimes.com/games/wordle/index.html)
+- **Solving Wordle using information theory** by 3B1B (https://www.youtube.com/watch?v=v68zYyaEmEA)
+- **Optimal Wordle Solutions** by Jonathon Olsen (https://jonathanolson.net/experiments/optimal-wordle-solutions)
+- **Wordle-solving state of the art: all optimality results so far** by Laurent Poirrier (https://www.poirrier.ca/notes/wordle-optimal/)
