@@ -7,6 +7,7 @@ Module.onRuntimeInitialized = async _ => {
   let prevGuesses = [];
   let prevFeedback = [];
   
+  // Function to toggle impossible/hard mode on and off
   function toggleHardMode() {
     if (hardMode) {
       hardMode = false;
@@ -17,26 +18,28 @@ Module.onRuntimeInitialized = async _ => {
     resetGame();
   }
 
-  console.log(targetWord);
-
   let currentWord = '';
   let wordsSubmitted = 0;
 
+  // Function to allocate an array of strings in Javascript as C-style arrays
   function allocateStringArray(strings) {
     const ptrs = strings.map(str => {
-      const buffer = Module._malloc(str.length + 1); // Allocate memory for the string
-      Module.stringToUTF8(str, buffer, str.length + 1); // Copy the string to allocated memory
+      const buffer = Module._malloc(str.length + 1);
+      Module.stringToUTF8(str, buffer, str.length + 1);
       return buffer;
     });
 
-    const arrayPtr = Module._malloc(ptrs.length * 4); // Allocate memory for the array of pointers
+    // Allocate memory for the array of pointers
+    const arrayPtr = Module._malloc(ptrs.length * 4);
     ptrs.forEach((ptr, index) => {
-      Module.setValue(arrayPtr + index * 4, ptr, 'i32'); // Set the pointer in the array
+      // Set the pointer in the array
+      Module.setValue(arrayPtr + index * 4, ptr, 'i32');
     });
 
     return [arrayPtr, ptrs];
   }
 
+  // Function to help setup C-style arrays before passing it into the C++ function that makes guesses
   function hardModeGuessHelper(prevGuesses, prevFeedback, currentWordCPP) {
     const [prevGuessesArrPtr, ptrsOne] = allocateStringArray(prevGuesses);
     const [prevFeedbackArrPtr, ptrsTwo] = allocateStringArray(prevFeedback);
@@ -78,6 +81,7 @@ Module.onRuntimeInitialized = async _ => {
         prevGuesses.push(currentWord.toLowerCase());
         const feedback = Module.UTF8ToString(feedbackPtr);
         prevFeedback.push(feedback);
+
         if (feedback === 'GGGGG') {
           gameWon = true;
         }
@@ -116,18 +120,22 @@ Module.onRuntimeInitialized = async _ => {
     }
   }
 
+  // Function to show the victory popup
   function showVictoryPopUp() {
     document.getElementById('victory-popup').style.display = 'flex';
   }
 
+  // Function to show the defeat popup
   function showDefeatPopUp() {
     document.getElementById('defeat-popup').style.display = 'flex';
   }
 
+  // Function to close victory/defeat popup
   function closePopUp(popupId) {
     document.getElementById(popupId).style.display = 'none';
   }
 
+  // Function to reset the game state
   function resetGame() {
     // Close any open popups
     closePopUp('victory-popup');
@@ -139,7 +147,6 @@ Module.onRuntimeInitialized = async _ => {
 
     targetWordPtr = Module._createNewGame();
     targetWord = Module.UTF8ToString(targetWordPtr);
-    console.log(targetWord);
 
     // Clear the game board
     for (let row = 0; row < 6; row++) {
@@ -161,6 +168,7 @@ Module.onRuntimeInitialized = async _ => {
     prevFeedback = [];
   }
   
+  // Function to update grid colours according to feedback string
   function updateGridColours(feedbackString) {
     let index = 0;
     for (const character of feedbackString) {
@@ -184,6 +192,7 @@ Module.onRuntimeInitialized = async _ => {
     }
   }
 
+  // Function to update keyboard colours based on feedback string
   function updateKeyboard(feedback, guess) {
     for (let i = 0; i < guess.length; i++) {
       const letter = guess[i];
@@ -240,16 +249,16 @@ Module.onRuntimeInitialized = async _ => {
     popup.style.display = 'none';
   }
 
+  // Function to toggle the hard mode info pop-up
   function toggleInfoPopup() {
     var popup = document.getElementById("info-popup");
     popup.style.display = popup.style.display === 'none' ? 'flex' : 'none';
   }
-
   
   // Event listener for keyboard inputs
   document.addEventListener('keydown', (event) => {
     const key = event.key;
-    console.log(key);
+
     if (key === 'Backspace' || key == 'Enter' || /^[A-Z]$/i.test(key)) {
       handleKey(key);
     }
