@@ -43,3 +43,26 @@ em++ -std=c++17 -O3 --preload-file wordLists/answerlist.txt --preload-file wordL
 ## Impossible/Hard Mode
 
 The Impossible/Hard mode dynamically adjusts the difficulty of the game. In this mode, the game does not select a single word at the start. Instead, it evaluates the player's guesses against all possible words and provides feedback that is the least informative, making it more challenging to guess the correct word. This mode is designed for players seeking an extra challenge beyond the traditional Wordle gameplay.
+
+### How the Algorithm Works:
+- **Dynamic Word Selection**: Rather than sticking to one preselected word, the game evaluates each guess against a list of all possible words.
+- **Feedback Calculation**:
+  - **Filtering Possible Answers**: Using the `filterAnswerList` function, the game filters out words from the answer list that do not match the previous guesses and feedback. This is done by:
+    - Iterating over each word in the answer list.
+    - Comparing the word against each previous guess and its feedback.
+    - Keeping only those words that align with all previous feedback.
+  - **Determining Least Informative Feedback**: The game then uses the `findWorstFeedback` function to find the feedback that reveals the least information about the possible words. This involves:
+    - Comparing the current guess against each word in the filtered answer list.
+    - Counting the frequency of each possible feedback outcome.
+    - Selecting the most common (least informative) feedback to return to the player.
+- **Implementation Details**:
+  - The `makeHardModeGuess` function in the C++ code orchestrates this process, taking in previous guesses and their feedback, along with the current guess.
+  - The algorithm ensures that the player is consistently challenged, making the game engaging and unpredictable.
+
+## Acknowledgements
+
+Project inspired by the following sources:
+- Worlde (https://www.nytimes.com/games/wordle/index.html)
+- Solving Wordle using information theory by 3B1B (https://www.youtube.com/watch?v=v68zYyaEmEA)
+- Optimal Wordle Solutions by Jonathon Olsen (https://jonathanolson.net/experiments/optimal-wordle-solutions)
+- Wordle-solving state of the art: all optimality results so far by "aurent Poirrier (https://www.poirrier.ca/notes/wordle-optimal/)
