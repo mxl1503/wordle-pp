@@ -1,6 +1,8 @@
 Module.onRuntimeInitialized = async _ => {
   let targetWordPtr = Module._createNewGame();
   let targetWord = Module.UTF8ToString(targetWordPtr);
+  let currentWord = '';
+  let wordsSubmitted = 0;
 
   // Relevant to hard mode only
   let hardMode = false;
@@ -9,17 +11,9 @@ Module.onRuntimeInitialized = async _ => {
   
   // Function to toggle impossible/hard mode on and off
   function toggleHardMode() {
-    if (hardMode) {
-      hardMode = false;
-    } else {
-      hardMode = true;
-    }
-
+    hardMode = !hardMode;
     resetGame();
   }
-
-  let currentWord = '';
-  let wordsSubmitted = 0;
 
   // Function to allocate an array of strings in Javascript as C-style arrays
   function allocateStringArray(strings) {
@@ -61,56 +55,63 @@ Module.onRuntimeInitialized = async _ => {
       // Handle Backspace key to remove the last character from the current word
       currentWord = currentWord.slice(0, -1);
     } else if (key === 'Enter') {
-      // Convert to a C-Style string before calling functions in C++
-      const currentWordCPP = Module._malloc(currentWord.length + 1);
-      Module.stringToUTF8(currentWord.toLowerCase(), currentWordCPP, currentWord.length + 1);
-      
-      // Check if guess is a valid word
-      if (currentWord.length === 5 && Module._validateGuess(currentWordCPP)) {
-        // Again convert to a C-Style string before calling helper functions, then update grid
-        // accordingly
-        const targetWordCPP = Module._malloc(targetWord.length + 1);
-        Module.stringToUTF8(targetWord.toLowerCase(), targetWordCPP, targetWord.length + 1);
-        let feedbackPtr;
-        if (hardMode) {
-          feedbackPtr = hardModeGuessHelper(prevGuesses, prevFeedback, currentWordCPP);
-        } else {
-          feedbackPtr = Module._makeGuess(currentWordCPP, targetWordCPP);
-        }
-      
-        prevGuesses.push(currentWord.toLowerCase());
-        const feedback = Module.UTF8ToString(feedbackPtr);
-        prevFeedback.push(feedback);
-
-        if (feedback === 'GGGGG') {
-          gameWon = true;
-        }
-
-        // Update grid and keyboard colours
-        updateGridColours(feedback);
-        updateKeyboard(feedback, currentWord);
-
-        // Free strings
-        Module._free(feedbackPtr);
-        Module._free(targetWordCPP);
-        
-        if (!gameWon) {
-          currentWord = '';
-          wordsSubmitted++;
-        }
-      } else {
-        // Invalid word, show the invalid word popup
-        showInvalidWordPopup();
-      }
-
-      // Free string
-      Module._free(currentWordCPP)
+      processEnterKey(gameWon);
     } else if (key.length === 1 && currentWord.length < 5) {
       // Handle letter keys (A-Z) to add letters to the current word
       currentWord += key.toUpperCase();
     }
 
     // Update the display with the current word
+    updateGameState(gameWon);
+  }
+
+  // Function to help process what happens when the enter key is pressed
+  function processEnterKey(gameWon) {
+    // Convert to a C-Style string before calling functions in C++
+    const currentWordCPP = Module._malloc(currentWord.length + 1);
+    Module.stringToUTF8(currentWord.toLowerCase(), currentWordCPP, currentWord.length + 1);
+
+    // Check if guess is a valid word
+    if (currentWord.length === 5 && Module._validateGuess(currentWordCPP)) {
+      // Again convert to a C-Style string before calling helper functions, then update grid
+      // accordingly
+      const feedbackPtr = hardMode ? hardModeGuessHelper(prevGuesses, prevFeedback, currentWordCPP) : Module._makeGuess(currentWordCPP, targetWordPtr);
+      const feedback = Module.UTF8ToString(feedbackPtr);
+      gameLogic(feedback, gameWon);
+
+      // Free strings
+      Module._free(feedbackPtr);
+    } else {
+      showInvalidWordPopup();
+    }
+
+    Module._free(currentWordCPP);
+  }
+
+  // Function that implements game logic upon receiving feedback from a guess
+  function gameLogic(feedback, gameWon) {
+    // Update previous guesses and feedback arrays
+    prevGuesses.push(currentWord.toLowerCase());
+    prevFeedback.push(feedback);
+
+    // Update grid and keyboard colours
+    updateGridColours(feedback);
+    updateKeyboard(feedback, currentWord);
+
+    // Check if game is over
+    if (feedback === 'GGGGG') {
+      gameWon = true;
+      showVictoryPopUp();
+    }
+
+    if (!gameWon) {
+      currentWord = '';
+      wordsSubmitted++;
+    }
+  }
+
+  // Function that checks the game state
+  function updateGameState(gameWon) {
     if (gameWon) {
       showVictoryPopUp();
     } else if (wordsSubmitted >= 6) {
@@ -120,60 +121,21 @@ Module.onRuntimeInitialized = async _ => {
     }
   }
 
-  // Function to show the victory popup
-  function showVictoryPopUp() {
-    document.getElementById('victory-popup').style.display = 'flex';
-  }
-
-  // Function to show the defeat popup
-  function showDefeatPopUp() {
-    document.getElementById('defeat-popup').style.display = 'flex';
-  }
-
-  // Function to close victory/defeat popup
-  function closePopUp(popupId) {
-    document.getElementById(popupId).style.display = 'none';
-  }
-
-  // Function to reset the game state
-  function resetGame() {
-    // Close any open popups
-    closePopUp('victory-popup');
-    closePopUp('defeat-popup');
-
-    // Reset game state variables
-    wordsSubmitted = 0;
-    currentWord = '';
-
-    targetWordPtr = Module._createNewGame();
-    targetWord = Module.UTF8ToString(targetWordPtr);
-
-    // Clear the game board
-    for (let row = 0; row < 6; row++) {
-      for (let col = 0; col < 5; col++) {
-        const cell = document.getElementById(`cell-${row}-${col}`);
-        cell.innerText = '';
-        cell.style.backgroundColor = 'darkgray';
-      }
+  // Function that returns a string based on input character
+  function getColourFromFeedback(char) {
+    switch (char) {
+      case 'G': return 'rgb(106, 169, 100)';
+      case 'Y': return 'yellow';
+      default: return 'rgb(120, 124, 126)';
     }
-
-    // Reset the keyboard (if needed)
-    // Assuming each key has an ID like 'key-Q', 'key-W', etc.
-    const keys = document.querySelectorAll('.keyboard-key');
-    keys.forEach(key => {
-      key.classList.remove('correct', 'present', 'absent');
-    });
-
-    prevGuesses = [];
-    prevFeedback = [];
   }
-  
+
   // Function to update grid colours according to feedback string
   function updateGridColours(feedbackString) {
     let index = 0;
     for (const character of feedbackString) {
       const cell = document.getElementById(`cell-${wordsSubmitted}-${index}`);
-      const colour = getColorFromFeedback(character);
+      const colour = getColourFromFeedback(character);
   
       // Trigger flip animation
       cell.classList.add('flip-animation');
@@ -188,6 +150,22 @@ Module.onRuntimeInitialized = async _ => {
         cell.classList.remove('flip-animation');
       });
   
+      index++;
+    }
+  }
+
+  // Function to update the display with the current word
+  function updateDisplay(word) {
+    let index = 0;
+    for (const letter of word) {
+      const displayElement = document.getElementById(`cell-${wordsSubmitted}-${index}`);
+      displayElement.innerText = letter;
+      index++;
+    }
+
+    while (index < 5) {
+      const displayElement = document.getElementById(`cell-${wordsSubmitted}-${index}`);
+      displayElement.innerText = null;
       index++;
     }
   }
@@ -209,29 +187,14 @@ Module.onRuntimeInitialized = async _ => {
     }
   }
 
-  // Function that returns a string based on input character
-  function getColorFromFeedback(char) {
-    switch (char) {
-      case 'G': return 'rgb(106, 169, 100)';
-      case 'Y': return 'yellow';
-      default: return 'rgb(120, 124, 126)';
-    }
+  // Function to show the victory popup
+  function showVictoryPopUp() {
+    document.getElementById('victory-popup').style.display = 'flex';
   }
 
-  // Function to update the display with the current word
-  function updateDisplay(word) {
-    let index = 0;
-    for (const letter of word) {
-      const displayElement = document.getElementById(`cell-${wordsSubmitted}-${index}`);
-      displayElement.innerText = letter;
-      index++;
-    }
-
-    while (index < 5) {
-      const displayElement = document.getElementById(`cell-${wordsSubmitted}-${index}`);
-      displayElement.innerText = null;
-      index++;
-    }
+  // Function to show the defeat popup
+  function showDefeatPopUp() {
+    document.getElementById('defeat-popup').style.display = 'flex';
   }
 
   // Function to create the invalid word pop-up
@@ -254,13 +217,48 @@ Module.onRuntimeInitialized = async _ => {
     var popup = document.getElementById("info-popup");
     popup.style.display = popup.style.display === 'none' ? 'flex' : 'none';
   }
+
+  // Function to close victory/defeat popup
+  function closePopUp(popupId) {
+    document.getElementById(popupId).style.display = 'none';
+  }
+
+  // Function to reset the game state
+  function resetGame() {
+    // Close any open popups
+    closePopUp('victory-popup');
+    closePopUp('defeat-popup');
+
+    // Reset game state variables
+    wordsSubmitted = 0;
+    currentWord = '';
+    prevGuesses = [];
+    prevFeedback = [];
+
+    targetWordPtr = Module._createNewGame();
+    targetWord = Module.UTF8ToString(targetWordPtr);
+
+    // Clear the game board
+    for (let row = 0; row < 6; row++) {
+      for (let col = 0; col < 5; col++) {
+        const cell = document.getElementById(`cell-${row}-${col}`);
+        cell.innerText = '';
+        cell.style.backgroundColor = 'darkgray';
+      }
+    }
+
+    // Reset the keyboard (if needed)
+    // Assuming each key has an ID like 'key-Q', 'key-W', etc.
+    const keys = document.querySelectorAll('.keyboard-key');
+    keys.forEach(key => {
+      key.classList.remove('correct', 'present', 'absent');
+    });
+  }
   
   // Event listener for keyboard inputs
   document.addEventListener('keydown', (event) => {
-    const key = event.key;
-
-    if (key === 'Backspace' || key == 'Enter' || /^[A-Z]$/i.test(key)) {
-      handleKey(key);
+    if (event.key === 'Backspace' || event.key === 'Enter' || /^[A-Z]$/i.test(event.key)) {
+      handleKey(event.key);
     }
   });
 
