@@ -4,29 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wordle-PP</title>
-    <link rel="stylesheet" href="styles.css"> <!-- Add your CSS file here -->
+    <link rel="stylesheet" href="styles.css">
     <style>
-        /* Add your additional CSS styles here */
-        .grid-cell {
-            width: 60px;
-            height: 60px;
-            background-color: darkgray;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 3px;
-            text-align: center;
-            line-height: 40px;
-            font-size: 50px;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-        .grid-row {
-            display: flex; /* Use flexbox for alignment */
-            justify-content: center; /* Center the cells horizontally */
-            margin-bottom: 3px; /* Add some space between each row */
-        }
-
     </style>
 </head>
 <body>
@@ -42,7 +21,7 @@
                       <input type="checkbox" id="hardMode" onchange="toggleHardMode()">
                       <span class="slider round"></span>
                   </label>
-                  <span>Hard Mode</span>
+                  <span>Impossible Mode</span>
                 </div>
             </header>
             <div id="board-container">
@@ -150,7 +129,6 @@
       </div>
     </div>
 
-    <!-- Your JavaScript file -->
     <script src="wordle.js"></script>
     <script type="module" src="game.js"></script>
 </body>

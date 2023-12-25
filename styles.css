@@ -24,12 +24,32 @@ body {
   display: none; /* Initially hidden */
 }
 
+.grid-cell {
+  width: 60px;
+  height: 60px;
+  background-color: darkgray;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 3px;
+  text-align: center;
+  line-height: 40px;
+  font-size: 50px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+.grid-row {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 3px;
+}
+
 #popup-message {
-  background-color: #ff0000; /* Red background color */
-  color: #ffffff; /* White text color */
+  background-color: #ff0000;
+  color: #ffffff;
   padding: 10px 20px;
   border-radius: 5px;
-  animation: fadeOut 2s ease-in-out forwards; /* Fade out animation */
+  animation: fadeOut 2s ease-in-out forwards;
 }
 
 @keyframes fadeOut {
@@ -38,7 +58,7 @@ body {
   }
   100% {
     opacity: 0;
-    display: none; /* Hide after fading out */
+    display: none;
   }
 }
 
@@ -94,19 +114,19 @@ header {
 }
 
 .keyboard-key {
-  padding: 15px 20px; /* Increase padding for larger buttons */
-  margin: 0 3px; /* Consistent margin between keys */
-  background-color: #ddd; /* Default key color */
+  padding: 15px 20px;
+  margin: 0 3px;
+  background-color: #ddd;
   border: none;
   border-radius: 6px;
-  font-size: 1.2rem; /* Larger font size for the key labels */
+  font-size: 1.2rem;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
 
 .wide-button {
-  padding: 15px 36px; /* Larger padding for wide buttons */
-  margin-right: 3px; /* Adjust if necessary for alignment */
+  padding: 15px 36px;
+  margin-right: 3px;
 }
 
 .flip-animation {
@@ -143,7 +163,7 @@ header {
   top: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); /* semi-transparent background */
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -160,22 +180,20 @@ header {
   margin-top: 0;
 }
 
-/* The switch - the box around the slider */
+/* Box around the slider */
 .switch {
   position: relative;
   display: inline-block;
-  width: 60px; /* Width of the switch */
-  height: 34px; /* Height of the switch */
+  width: 60px;
+  height: 34px;
 }
 
-/* Hide default checkbox */
 .switch input {
   opacity: 0;
   width: 0;
   height: 0;
 }
 
-/* The slider */
 .slider {
   position: absolute;
   cursor: pointer;
@@ -191,14 +209,14 @@ header {
 .slider:before {
   position: absolute;
   content: "";
-  height: 26px; /* Height of the circle */
-  width: 26px; /* Width of the circle */
-  left: 4px; /* Initial left alignment */
-  bottom: 4px; /* Align to the bottom, with a slight gap */
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
   background-color: white;
   -webkit-transition: .4s;
   transition: .4s;
-  border-radius: 50%; /* Make it a circle */
+  border-radius: 50%;
 }
 
 input:checked + .slider {
@@ -206,9 +224,9 @@ input:checked + .slider {
 }
 
 input:checked + .slider:before {
-  -webkit-transform: translateX(16px); /* Adjust this value if the circle goes too far */
+  -webkit-transform: translateX(16px);
   -ms-transform: translateX(16px);
-  transform: translateX(16px); /* Adjust this value if the circle goes too far */
+  transform: translateX(16px);
 }
 
 /* Rounded sliders */
@@ -221,13 +239,13 @@ input:checked + .slider:before {
 }
 
 .hard-mode-toggle {
-    display: flex;
-    align-items: center;
-    margin-top: 10px;
-    margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 .hard-mode-toggle span {
-    margin-left: 10px;
-    color: white;
+  margin-left: 10px;
+  color: white;
 }
