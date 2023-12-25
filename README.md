@@ -33,7 +33,7 @@ em++ -std=c++17 -O3 --preload-file wordLists/answerlist.txt --preload-file wordL
 -s EXPORTED_RUNTIME_METHODS='["ccall", "cwrap", "UTF8ToString", "stringToUTF8", "setValue"]'
 ```
 
-- Host the output files (wordle.js, wordle.wasm, and associated HTML/CSS files) on a web server.
+- Host the output files (wordle.js, wordle.data, wordle.wasm, and associated HTML/CSS files) on a web server.
 
 ### Executing program
 
