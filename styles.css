@@ -1,15 +1,15 @@
+/* Base Styles */
 * {
   margin: 0;
   padding: 0;
 }
 
-html,
-body {
+html, body {
   height: 100%;
-  font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
-    "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+  font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande", "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
 }
 
+/* Popup Styles */
 #popup-container {
   display: flex;
   justify-content: center;
@@ -24,24 +24,36 @@ body {
   display: none;
 }
 
-.grid-cell {
-  width: 60px;
-  height: 60px;
-  background-color: darkgray;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 3px;
-  text-align: center;
-  line-height: 40px;
-  font-size: 50px;
-  font-weight: bold;
-  text-transform: uppercase;
+.info-popup-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  display: none;
 }
-.grid-row {
+
+.popup-end-container {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
-  margin-bottom: 3px;
+  align-items: center;
+}
+
+.popup-content {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 20px;
+  text-align: center;
+}
+
+.popup-content h2 {
+  margin-top: 0;
 }
 
 #popup-message {
@@ -52,6 +64,7 @@ body {
   animation: fadeOut 2s ease-in-out forwards;
 }
 
+/* Animations */
 @keyframes fadeOut {
   0% {
     opacity: 1;
@@ -62,6 +75,19 @@ body {
   }
 }
 
+@keyframes flip {
+  0% {
+    transform: rotateX(0);
+  }
+  50% {
+    transform: rotateX(90deg);
+  }
+  100% {
+    transform: rotateX(0);
+  }
+}
+
+/* Game Layout */
 #container {
   display: flex;
   background-color: rgb(18, 18, 19);
@@ -88,8 +114,7 @@ header {
   font-weight: bold;
   margin: 0.4rem 0 0.4rem 0;
   text-align: center;
-  font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
-    "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+  font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande", "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
 }
 
 #board-container {
@@ -107,6 +132,29 @@ header {
   margin-top: 20px;
 }
 
+/* Grid Styles */
+.grid-cell {
+  width: 60px;
+  height: 60px;
+  background-color: darkgray;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 3px;
+  text-align: center;
+  line-height: 40px;
+  font-size: 50px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.grid-row {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 3px;
+}
+
+/* Keyboard Styles */
 .keyboard-row {
   display: flex;
   justify-content: center;
@@ -129,58 +177,7 @@ header {
   margin-right: 3px;
 }
 
-.flip-animation {
-  animation: flip 0.8s forwards;
-}
-
-@keyframes flip {
-  0% {
-    transform: rotateX(0);
-  }
-  50% {
-    transform: rotateX(90deg);
-  }
-  100% {
-    transform: rotateX(0);
-  }
-}
-
-.correct {
-  background-color: rgb(106, 169, 100);
-}
-
-.present {
-  background-color: yellow;
-}
-
-.absent {
-  background-color: rgb(120, 124, 126);
-}
-
-.popup-end-container {
-  position: fixed;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.popup-content {
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 20px;
-  text-align: center;
-}
-
-.popup-content h2 {
-  margin-top: 0;
-}
-
-/* Box around the slider */
+/* Toggle Switch Styles */
 .switch {
   position: relative;
   display: inline-block;
@@ -229,7 +226,6 @@ input:checked + .slider:before {
   transform: translateX(16px);
 }
 
-/* Rounded sliders */
 .slider.round {
   border-radius: 34px;
 }
@@ -238,6 +234,7 @@ input:checked + .slider:before {
   border-radius: 50%;
 }
 
+/* Hard Mode and Info Icon Styles */
 .hard-mode-toggle {
   display: flex;
   align-items: center;
@@ -248,15 +245,6 @@ input:checked + .slider:before {
 .hard-mode-toggle span {
   margin-left: 10px;
   color: white;
-}
-
-.info-popup-container {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 1000;
-  display: none;
 }
 
 .info-icon {
@@ -271,4 +259,21 @@ input:checked + .slider:before {
   line-height: 20px;
   cursor: pointer;
   font-size: 16px;
+}
+
+/* Feedback Styles */
+.correct {
+  background-color: rgb(106, 169, 100);
+}
+
+.present {
+  background-color: yellow;
+}
+
+.absent {
+  background-color: rgb(120, 124, 126);
+}
+
+.flip-animation {
+  animation: flip 0.8s forwards;
 }
