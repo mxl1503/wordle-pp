@@ -42,7 +42,7 @@ em++ -std=c++17 -O3 --preload-file wordLists/answerlist.txt --preload-file wordL
 
 ## Impossible/Hard Mode
 
-The Impossible/Hard mode dynamically adjusts the difficulty of the game. In this mode, the game does not select a single word at the start. Instead, it evaluates the player's guesses against all possible words and provides feedback that is the least informative, making it more challenging to guess the correct word. This mode is designed for players seeking an extra challenge beyond the traditional Wordle gameplay.
+The Impossible/Hard mode dynamically adjusts the difficulty of the game. In this mode, the game does not select a single word at the start. Instead, it evaluates the player's guesses against all possible words and provides feedback that is the least informative, making it more challenging to guess the correct word. This mode is designed for players seeking an extra challenge beyond the traditional Wordle gameplay, and while still possible to beat, requires optimal guessses to be made.
 
 ### How the Algorithm Works:
 - **Dynamic Word Selection**: Rather than sticking to one preselected word, the game evaluates each guess against a list of all possible words.
