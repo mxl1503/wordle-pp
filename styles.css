@@ -108,6 +108,13 @@ header {
   border-bottom: 1px solid rgb(58, 58, 60);
 }
 
+.header-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
 .title {
   color: gainsboro;
   font-size: 2.5rem;
@@ -115,6 +122,7 @@ header {
   margin: 0.4rem 0 0.4rem 0;
   text-align: center;
   font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande", "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+  flex-grow: 1;
 }
 
 #board-container {
@@ -234,12 +242,11 @@ input:checked + .slider:before {
   border-radius: 50%;
 }
 
-/* Hard Mode and Info Icon Styles */
+/* Hard Mode, Info Icon and Restart Button Styles */
 .hard-mode-toggle {
   display: flex;
   align-items: center;
-  margin-top: 10px;
-  margin-bottom: 10px;
+  margin-right: 20px;
 }
 
 .hard-mode-toggle span {
@@ -259,6 +266,18 @@ input:checked + .slider:before {
   line-height: 20px;
   cursor: pointer;
   font-size: 16px;
+}
+
+#restart-game {
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+#restart-game img {
+  height: 40px;
+  width: auto;
 }
 
 /* Feedback Styles */
