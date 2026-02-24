@@ -1,13 +1,13 @@
 EMSDK_IMAGE := emscripten/emsdk:3.1.71
 UID_GID := $(shell id -u):$(shell id -g)
 
-SRC := wordle.cpp
-OUT := wordle.js
+SRC := cpp-logic/src/wasm_exports.cpp cpp-logic/src/engine.cpp
+OUT := frontend/wordle.js
 
-EXPORTED_FUNCTIONS := ["_getAnswerList","_getGuessList","_createNewGame","_makeGuess","_evaluateGuess","_validateGuess","_isMatch","_filterAnswerList","_findWorstFeedback","_makeHardModeGuess","_free","_malloc"]
+EXPORTED_FUNCTIONS := ["_createNewGame","_makeGuess","_validateGuess","_makeHardModeGuess","_freeCString","_free","_malloc"]
 EXPORTED_RUNTIME_METHODS := ["ccall","cwrap","UTF8ToString","stringToUTF8","setValue"]
 
-.PHONY: build build-clean serve clean
+.PHONY: build build-clean serve clean test-cpp
 
 build:
 	docker run --rm \
@@ -16,6 +16,7 @@ build:
 		-w /src \
 		$(EMSDK_IMAGE) \
 		em++ -std=c++17 -O3 \
+		-Icpp-logic/include \
 		--preload-file wordLists/answerlist.txt \
 		--preload-file wordLists/guesslist.txt \
 		$(SRC) -o $(OUT) -s WASM=1 \
@@ -27,5 +28,10 @@ build-clean: clean build
 serve:
 	docker compose up --build web
 
+test-cpp:
+	cmake -S . -B build/tests -DBUILD_TESTING=ON
+	cmake --build build/tests
+	ctest --test-dir build/tests --output-on-failure
+
 clean:
-	rm -f wordle.js wordle.wasm wordle.data
+	rm -f frontend/wordle.js frontend/wordle.wasm frontend/wordle.data

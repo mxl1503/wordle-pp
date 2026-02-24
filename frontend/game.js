@@ -1,6 +1,5 @@
 Module.onRuntimeInitialized = async _ => {
   let targetWordPtr = Module._createNewGame();
-  let targetWord = Module.UTF8ToString(targetWordPtr);
   let currentWord = '';
   let wordsSubmitted = 0;
 
@@ -80,7 +79,7 @@ Module.onRuntimeInitialized = async _ => {
       gameLogic(feedback, gameWon);
 
       // Free strings
-      Module._free(feedbackPtr);
+      Module._freeCString(feedbackPtr);
     } else {
       showInvalidWordPopup();
     }
@@ -235,8 +234,10 @@ Module.onRuntimeInitialized = async _ => {
     prevGuesses = [];
     prevFeedback = [];
 
+    if (targetWordPtr) {
+      Module._freeCString(targetWordPtr);
+    }
     targetWordPtr = Module._createNewGame();
-    targetWord = Module.UTF8ToString(targetWordPtr);
 
     // Clear the game board
     for (let row = 0; row < 6; row++) {
@@ -259,6 +260,13 @@ Module.onRuntimeInitialized = async _ => {
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Backspace' || event.key === 'Enter' || /^[A-Z]$/i.test(event.key)) {
       handleKey(event.key);
+    }
+  });
+
+  window.addEventListener('beforeunload', () => {
+    if (targetWordPtr) {
+      Module._freeCString(targetWordPtr);
+      targetWordPtr = 0;
     }
   });
 

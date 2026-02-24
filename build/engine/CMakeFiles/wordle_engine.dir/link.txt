@@ -1,0 +1,2 @@
+/usr/bin/ar qc libwordle_engine.a "CMakeFiles/wordle_engine.dir/cpp-logic/src/engine.cpp.o"
+/usr/bin/ranlib libwordle_engine.a

@@ -40,7 +40,7 @@ make build
 
 ### Build with Docker
 
-Compile `wordle.cpp` to `wordle.js`, `wordle.wasm`, and `wordle.data`:
+Compile `cpp-logic/src/wasm_exports.cpp` and `cpp-logic/src/engine.cpp` to `frontend/wordle.js`, `frontend/wordle.wasm`, and `frontend/wordle.data`:
 
 ```sh
 make build
@@ -73,9 +73,21 @@ make clean
 ## Manual compile command (reference)
 
 ```sh
-em++ -std=c++17 -O3 --preload-file wordLists/answerlist.txt --preload-file wordLists/guesslist.txt wordle.cpp -o wordle.js -s WASM=1 \
--s EXPORTED_FUNCTIONS='["_getAnswerList", "_getGuessList", "_createNewGame", "_makeGuess", "_evaluateGuess", "_validateGuess", "_isMatch", "_filterAnswerList", "_findWorstFeedback", "_makeHardModeGuess", "_free", "_malloc"]' \
+em++ -std=c++17 -O3 -Icpp-logic/include --preload-file wordLists/answerlist.txt --preload-file wordLists/guesslist.txt cpp-logic/src/wasm_exports.cpp cpp-logic/src/engine.cpp -o frontend/wordle.js -s WASM=1 \
+-s EXPORTED_FUNCTIONS='["_createNewGame", "_makeGuess", "_validateGuess", "_makeHardModeGuess", "_freeCString", "_free", "_malloc"]' \
 -s EXPORTED_RUNTIME_METHODS='["ccall", "cwrap", "UTF8ToString", "stringToUTF8", "setValue"]'
+```
+
+### Run C++ Unit Tests (GoogleTest)
+
+Install GoogleTest first (example on macOS):
+
+```sh
+brew install googletest
+```
+
+```sh
+make test-cpp
 ```
 
 ## Impossible/Hard Mode
