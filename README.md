@@ -18,27 +18,65 @@ This project is a full-stack implementation of Wordle with an added Impossible/H
 
 ### Dependencies
 
-- Emscripten SDK for compiling C++ to WebAssembly.
-- Any modern web browser for running the game.
+- Docker (required)
+- Docker Compose plugin (usually included with Docker Desktop)
 
-### Installing
+No local Emscripten installation is required.
 
-- Clone the repository to your local machine.
-- Ensure Emscripten SDK is installed and properly set up.
-- Compile the C++ code to WebAssembly using Emscripten.
+### Docker Daemon Requirement
+
+If you see `Cannot connect to the Docker daemon` when running `make build`, start Docker Desktop first, then verify Docker is reachable:
+
+```sh
+open -a Docker
+docker version
+```
+
+After `docker version` succeeds, rerun:
+
+```sh
+make build
+```
+
+### Build with Docker
+
+Compile `wordle.cpp` to `wordle.js`, `wordle.wasm`, and `wordle.data`:
+
+```sh
+make build
+```
+
+Equivalent Compose command:
+
+```sh
+docker compose run --rm build
+```
+
+### Serve Locally with Docker
+
+Start a static web server on port `8080`:
+
+```sh
+make serve
+```
+
+Then open:
+
+- [http://localhost:8080](http://localhost:8080)
+
+### Clean Build Artifacts
+
+```sh
+make clean
+```
+
+## Manual compile command (reference)
 
 ```sh
 em++ -std=c++17 -O3 --preload-file wordLists/answerlist.txt --preload-file wordLists/guesslist.txt wordle.cpp -o wordle.js -s WASM=1 \
 -s EXPORTED_FUNCTIONS='["_getAnswerList", "_getGuessList", "_createNewGame", "_makeGuess", "_evaluateGuess", "_validateGuess", "_isMatch", "_filterAnswerList", "_findWorstFeedback", "_makeHardModeGuess", "_free", "_malloc"]' \
 -s EXPORTED_RUNTIME_METHODS='["ccall", "cwrap", "UTF8ToString", "stringToUTF8", "setValue"]'
 ```
-
-- Host the output files (wordle.js, wordle.data, wordle.wasm, and associated HTML/CSS files) on a web server.
-
-### Executing program
-
-- Open the hosted webpage in a browser to start playing the game.
-- Choose between the classic mode and the Impossible/Hard mode for varying levels of difficulty.
 
 ## Impossible/Hard Mode
 

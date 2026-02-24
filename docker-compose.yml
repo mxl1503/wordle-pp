@@ -1,0 +1,33 @@
+services:
+  build:
+    build:
+      context: .
+      dockerfile: Dockerfile.build
+    image: wordle-pp-build
+    working_dir: /src
+    volumes:
+      - .:/src
+    command:
+      - em++
+      - -std=c++17
+      - -O3
+      - --preload-file
+      - wordLists/answerlist.txt
+      - --preload-file
+      - wordLists/guesslist.txt
+      - wordle.cpp
+      - -o
+      - wordle.js
+      - -s
+      - WASM=1
+      - -s
+      - EXPORTED_FUNCTIONS=["_getAnswerList","_getGuessList","_createNewGame","_makeGuess","_evaluateGuess","_validateGuess","_isMatch","_filterAnswerList","_findWorstFeedback","_makeHardModeGuess","_free","_malloc"]
+      - -s
+      - EXPORTED_RUNTIME_METHODS=["ccall","cwrap","UTF8ToString","stringToUTF8","setValue"]
+
+  web:
+    image: nginx:1.27-alpine
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/usr/share/nginx/html:ro
