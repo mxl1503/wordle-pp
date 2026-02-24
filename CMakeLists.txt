@@ -14,11 +14,6 @@ target_include_directories(wordle_engine
     ${PROJECT_SOURCE_DIR}/cpp-logic/include
 )
 
-add_executable(hard_mode_testing
-  hardModeTesting.cpp
-)
-target_link_libraries(hard_mode_testing PRIVATE wordle_engine)
-
 include(CTest)
 if(BUILD_TESTING)
   add_subdirectory(cpp-logic/tests)
