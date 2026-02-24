@@ -17,8 +17,8 @@ build:
 		$(EMSDK_IMAGE) \
 		em++ -std=c++17 -O3 \
 		-Icpp-logic/include \
-		--preload-file wordLists/answerlist.txt \
-		--preload-file wordLists/guesslist.txt \
+		--preload-file cpp-logic/data/wordlists/answerList.txt \
+		--preload-file cpp-logic/data/wordlists/guessList.txt \
 		$(SRC) -o $(OUT) -s WASM=1 \
 		-s EXPORTED_FUNCTIONS='$(EXPORTED_FUNCTIONS)' \
 		-s EXPORTED_RUNTIME_METHODS='$(EXPORTED_RUNTIME_METHODS)'

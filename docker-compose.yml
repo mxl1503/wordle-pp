@@ -13,9 +13,9 @@ services:
       - -O3
       - -Icpp-logic/include
       - --preload-file
-      - wordLists/answerlist.txt
+      - cpp-logic/data/wordlists/answerList.txt
       - --preload-file
-      - wordLists/guesslist.txt
+      - cpp-logic/data/wordlists/guessList.txt
       - cpp-logic/src/wasm_exports.cpp
       - cpp-logic/src/engine.cpp
       - -o

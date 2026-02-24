@@ -18,7 +18,41 @@ This project is a full-stack implementation of Wordle with an added Impossible/H
 
 - `cpp-logic/`: C++ engine, WASM exports, and C++ tests.
 - `frontend/`: Static web app (`index.html`, `styles.css`, `game.js`) and generated WASM bundle.
-- `wordLists/`: Answer/guess dictionaries packaged into WASM data.
+- `cpp-logic/data/wordlists/`: Answer/guess dictionaries and generated wordlist assets.
+- `cpp-logic/data/data-utils/`: Utility scripts used to generate/sort wordlist data.
+
+```text
+wordle-pp/
+|-- cpp-logic/
+|   |-- include/wordle/
+|   |   `-- engine.hpp
+|   |-- src/
+|   |   |-- engine.cpp
+|   |   `-- wasm_exports.cpp
+|   |-- tests/
+|   |   |-- CMakeLists.txt
+|   |   `-- engine_test.cpp
+|   |-- data/wordlists/
+|   |   |-- answerList.txt
+|   |   |-- guessList.txt
+|   |   |-- unsortedWordleAnswers.txt
+|   |   `-- stringPermutations.txt
+|   `-- data/data-utils/
+|       `-- wordlist_tool.py
+|-- frontend/
+|   |-- index.html
+|   |-- styles.css
+|   |-- game.js
+|   |-- icons/
+|   |-- wordle.js
+|   |-- wordle.wasm
+|   `-- wordle.data
+|-- Makefile
+|-- CMakeLists.txt
+|-- Dockerfile.build
+|-- docker-compose.yml
+`-- README.md
+```
 
 ## Getting Started
 
@@ -81,7 +115,7 @@ make clean
 ## Manual compile command (reference)
 
 ```sh
-em++ -std=c++17 -O3 -Icpp-logic/include --preload-file wordLists/answerlist.txt --preload-file wordLists/guesslist.txt cpp-logic/src/wasm_exports.cpp cpp-logic/src/engine.cpp -o frontend/wordle.js -s WASM=1 \
+em++ -std=c++17 -O3 -Icpp-logic/include --preload-file cpp-logic/data/wordlists/answerList.txt --preload-file cpp-logic/data/wordlists/guessList.txt cpp-logic/src/wasm_exports.cpp cpp-logic/src/engine.cpp -o frontend/wordle.js -s WASM=1 \
 -s EXPORTED_FUNCTIONS='["_createNewGame", "_makeGuess", "_validateGuess", "_makeHardModeGuess", "_freeCString", "_free", "_malloc"]' \
 -s EXPORTED_RUNTIME_METHODS='["ccall", "cwrap", "UTF8ToString", "stringToUTF8", "setValue"]'
 ```
@@ -111,6 +145,12 @@ make install-hooks
 ```
 
 The hook formats staged C/C++ files with `clang-format` and re-stages them before commit.
+
+### Wordlist Utilities
+
+Wordlist utility CLI docs are in:
+
+- [`cpp-logic/data/data-utils/README.md`](./cpp-logic/data/data-utils/README.md)
 
 ## Impossible/Hard Mode
 
