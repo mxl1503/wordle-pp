@@ -100,6 +100,18 @@ make test-cpp
 
 If CMake cannot find GTest, install it and re-run `make test-cpp`.
 
+### Formatting and Pre-Commit Hook
+
+This repo uses [`.clang-format`](./.clang-format) for C/C++ formatting.
+
+Install the local git pre-commit hook:
+
+```sh
+make install-hooks
+```
+
+The hook formats staged C/C++ files with `clang-format` and re-stages them before commit.
+
 ## Impossible/Hard Mode
 
 The Impossible/Hard mode dynamically adjusts the difficulty of the game. In this mode, the game does not select a single word at the start. Instead, it evaluates the player's guesses against all possible words and provides feedback that is the least informative, making it more challenging to guess the correct word. This mode is designed for players seeking an extra challenge beyond the traditional Wordle gameplay, and while still possible to beat, requires optimal guesses.

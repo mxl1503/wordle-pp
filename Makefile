@@ -7,7 +7,7 @@ OUT := frontend/wordle.js
 EXPORTED_FUNCTIONS := ["_createNewGame","_makeGuess","_validateGuess","_makeHardModeGuess","_freeCString","_free","_malloc"]
 EXPORTED_RUNTIME_METHODS := ["ccall","cwrap","UTF8ToString","stringToUTF8","setValue"]
 
-.PHONY: build build-clean serve clean test-cpp
+.PHONY: build build-clean serve clean test-cpp install-hooks
 
 build:
 	docker run --rm \
@@ -32,6 +32,12 @@ test-cpp:
 	cmake -S . -B build/tests -DBUILD_TESTING=ON
 	cmake --build build/tests
 	ctest --test-dir build/tests --output-on-failure
+
+install-hooks:
+	mkdir -p .git/hooks
+	cp .githooks/pre-commit .git/hooks/pre-commit
+	chmod +x .git/hooks/pre-commit
+	@echo "Installed pre-commit hook: .git/hooks/pre-commit"
 
 clean:
 	rm -f frontend/wordle.js frontend/wordle.wasm frontend/wordle.data
