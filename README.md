@@ -50,7 +50,9 @@ wordle-pp/
 |-- Makefile
 |-- CMakeLists.txt
 |-- Dockerfile.build
+|-- Dockerfile.test
 |-- docker-compose.yml
+|-- .github/workflows/ci.yml
 `-- README.md
 ```
 
@@ -134,6 +136,12 @@ make test-cpp
 
 If CMake cannot find GTest, install it and re-run `make test-cpp`.
 
+Run the same C++ tests in Docker (no host GTest required):
+
+```sh
+make test-cpp-docker
+```
+
 ### Formatting and Pre-Commit Hook
 
 This repo uses [`.clang-format`](./.clang-format) for C/C++ formatting.
@@ -145,6 +153,12 @@ make install-hooks
 ```
 
 The hook formats staged C/C++ files with `clang-format` and re-stages them before commit.
+
+Check formatting locally:
+
+```sh
+make check-format-cpp
+```
 
 ### Wordlist Utilities
 
