@@ -6,7 +6,10 @@ if ! command -v clang-format >/dev/null 2>&1; then
     exit 1
 fi
 
-mapfile -t files < <(
+files=()
+while IFS= read -r file; do
+    files+=("$file")
+done < <(
     git diff --cached --name-only --diff-filter=ACMR \
     | grep -E '\.(c|cc|cpp|cxx|h|hh|hpp|hxx)$' || true
 )
