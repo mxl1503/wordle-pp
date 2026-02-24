@@ -1,4 +1,16 @@
-wordle.js
-wordle.data
-wordle.wasm
 .DS_Store
+
+# Build artifacts
+build/
+
+# CMake generated files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+CTestTestfile.cmake
+Testing/
+
+# Generated frontend WASM bundle
+frontend/wordle.js
+frontend/wordle.wasm
+frontend/wordle.data

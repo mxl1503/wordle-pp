@@ -11,17 +11,19 @@ services:
       - em++
       - -std=c++17
       - -O3
+      - -Icpp-logic/include
       - --preload-file
       - wordLists/answerlist.txt
       - --preload-file
       - wordLists/guesslist.txt
-      - wordle.cpp
+      - cpp-logic/src/wasm_exports.cpp
+      - cpp-logic/src/engine.cpp
       - -o
-      - wordle.js
+      - frontend/wordle.js
       - -s
       - WASM=1
       - -s
-      - EXPORTED_FUNCTIONS=["_getAnswerList","_getGuessList","_createNewGame","_makeGuess","_evaluateGuess","_validateGuess","_isMatch","_filterAnswerList","_findWorstFeedback","_makeHardModeGuess","_free","_malloc"]
+      - EXPORTED_FUNCTIONS=["_createNewGame","_makeGuess","_validateGuess","_makeHardModeGuess","_freeCString","_free","_malloc"]
       - -s
       - EXPORTED_RUNTIME_METHODS=["ccall","cwrap","UTF8ToString","stringToUTF8","setValue"]
 
@@ -30,4 +32,4 @@ services:
     ports:
       - "8080:80"
     volumes:
-      - .:/usr/share/nginx/html:ro
+      - ./frontend:/usr/share/nginx/html:ro
