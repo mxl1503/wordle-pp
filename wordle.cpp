@@ -206,6 +206,7 @@ const char *makeHardModeGuess(const char **prevGuessesArray, const char **prevFe
     // Convert feedback to a C-style string for return
     char *feedbackCStr = new char[feedback.size() + 1];
     strcpy(feedbackCStr, feedback.c_str());
+    
     return feedbackCStr;
 }
 }
