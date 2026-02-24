@@ -1,7 +1,0 @@
-{
-	"InstallScripts" : 
-	[
-		"/Users/mlee/Desktop/projects/wordle-pp/build/tests/_deps/googletest-subbuild/cmake_install.cmake"
-	],
-	"Parallel" : false
-}
