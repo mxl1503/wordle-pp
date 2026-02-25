@@ -7,11 +7,13 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_library(wordle_engine STATIC
   cpp-logic/src/engine.cpp
+  cpp-solver/src/solver.cpp
 )
 
 target_include_directories(wordle_engine
   PUBLIC
     ${PROJECT_SOURCE_DIR}/cpp-logic/include
+    ${PROJECT_SOURCE_DIR}/cpp-solver/include
 )
 
 include(CTest)

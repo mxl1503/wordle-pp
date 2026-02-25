@@ -1,4 +1,5 @@
 .DS_Store
+.cache/
 
 # Build artifacts
 build/
@@ -9,6 +10,7 @@ CMakeFiles/
 cmake_install.cmake
 CTestTestfile.cmake
 Testing/
+compile_commands.json
 
 # Generated frontend WASM bundle
 frontend/wordle.js
