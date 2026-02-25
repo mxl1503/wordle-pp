@@ -64,10 +64,12 @@
     const [wordsSubmitted, setWordsSubmitted] = useState(0);
     const [prevGuesses, setPrevGuesses] = useState([]);
     const [prevFeedback, setPrevFeedback] = useState([]);
+    const [solverHint, setSolverHint] = useState(null);
     const [showVictory, setShowVictory] = useState(false);
     const [showDefeat, setShowDefeat] = useState(false);
     const [showInvalidWord, setShowInvalidWord] = useState(false);
     const targetWordPtrRef = useRef(0);
+    const initialSolverHintCacheRef = useRef(null);
     const hideInvalidWordTimeoutRef = useRef(0);
     const runtimeInitDoneRef = useRef(false);
 
@@ -216,6 +218,28 @@
       return returnVal;
     }
 
+    function recommendNextGuessHelper(guesses, feedbacks) {
+      const [prevGuessesArrPtr, guessPtrs] = allocateStringArray(guesses);
+      const [prevFeedbackArrPtr, feedbackPtrs] = allocateStringArray(feedbacks);
+
+      const returnVal = Module._recommendNextGuess(
+        prevGuessesArrPtr,
+        prevFeedbackArrPtr,
+        guesses.length
+      );
+
+      guessPtrs.forEach(function (ptr) {
+        Module._free(ptr);
+      });
+      feedbackPtrs.forEach(function (ptr) {
+        Module._free(ptr);
+      });
+      Module._free(prevGuessesArrPtr);
+      Module._free(prevFeedbackArrPtr);
+
+      return returnVal;
+    }
+
     function resetGame() {
       setShowVictory(false);
       setShowDefeat(false);
@@ -224,6 +248,7 @@
       setCurrentWord("");
       setPrevGuesses([]);
       setPrevFeedback([]);
+      setSolverHint(null);
       setBoard(buildInitialBoard());
 
       if (!runtimeReady) {
@@ -299,6 +324,7 @@
         const nextFeedback = prevFeedback.concat(feedback);
         setPrevGuesses(nextGuesses);
         setPrevFeedback(nextFeedback);
+        setSolverHint(null);
 
         if (feedback === "GGGGG") {
           setShowVictory(true);
@@ -315,6 +341,43 @@
       }
 
       Module._free(currentWordCPP);
+    }
+
+    function requestSolverHint() {
+      if (!runtimeReady) {
+        return;
+      }
+
+      const isInitialSolverState = prevGuesses.length === 0 && prevFeedback.length === 0;
+      if (isInitialSolverState && initialSolverHintCacheRef.current) {
+        setSolverHint(initialSolverHintCacheRef.current);
+        return;
+      }
+
+      const recommendationPtr = recommendNextGuessHelper(prevGuesses, prevFeedback);
+      const recommendationRaw = Module.UTF8ToString(recommendationPtr);
+      Module._freeCString(recommendationPtr);
+
+      const [bestGuess, remainingRaw] = recommendationRaw.split("|");
+      const remaining = Number(remainingRaw);
+      let nextHint;
+      if (!bestGuess) {
+        nextHint = {
+          bestGuess: "",
+          remainingSolutions: Number.isFinite(remaining) ? remaining : 0
+        };
+      } else {
+        nextHint = {
+          bestGuess: bestGuess.toUpperCase(),
+          remainingSolutions: Number.isFinite(remaining) ? remaining : 0
+        };
+      }
+
+      if (isInitialSolverState) {
+        initialSolverHintCacheRef.current = nextHint;
+      }
+
+      setSolverHint(nextHint);
     }
 
     function handleKey(key) {
@@ -428,6 +491,29 @@
                 );
               })
             )
+          ),
+          React.createElement(
+            "div",
+            { className: "solver-container" },
+            React.createElement(
+              "button",
+              {
+                className: "solver-button",
+                disabled: !runtimeReady || showVictory || showDefeat,
+                onClick: requestSolverHint
+              },
+              "Get Solver Hint"
+            ),
+            solverHint &&
+              React.createElement(
+                "div",
+                { className: "solver-result" },
+                "Best next guess: ",
+                React.createElement("strong", null, solverHint.bestGuess || "N/A"),
+                " (",
+                solverHint.remainingSolutions,
+                " possible solutions left)"
+              )
           ),
           React.createElement(
             "div",

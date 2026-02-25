@@ -4,6 +4,7 @@
 #include <emscripten.h>
 
 #include "wordle/engine.hpp"
+#include "wordle/solver.hpp"
 
 namespace {
 
@@ -46,6 +47,22 @@ makeHardModeGuess(const char** prevGuessesArray, const char** prevFeedbackArray,
 	}
 
 	return CopyCString(wordle::MakeHardModeGuess(prevGuesses, prevFeedback, guess));
+}
+
+EMSCRIPTEN_KEEPALIVE
+const char* recommendNextGuess(const char** prevGuessesArray, const char** prevFeedbackArray, int arrayLength) {
+	std::vector<std::string> prevGuesses;
+	std::vector<std::string> prevFeedback;
+	prevGuesses.reserve(arrayLength);
+	prevFeedback.reserve(arrayLength);
+
+	for (int i = 0; i < arrayLength; ++i) {
+		prevGuesses.emplace_back(prevGuessesArray[i]);
+		prevFeedback.emplace_back(prevFeedbackArray[i]);
+	}
+
+	const wordle::SolverRecommendation recommendation = wordle::RecommendNextGuess(prevGuesses, prevFeedback);
+	return CopyCString(recommendation.bestGuess + "|" + std::to_string(recommendation.remainingSolutions));
 }
 
 EMSCRIPTEN_KEEPALIVE
