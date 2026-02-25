@@ -64,12 +64,12 @@
     const [wordsSubmitted, setWordsSubmitted] = useState(0);
     const [prevGuesses, setPrevGuesses] = useState([]);
     const [prevFeedback, setPrevFeedback] = useState([]);
-    const [showInfo, setShowInfo] = useState(false);
     const [showVictory, setShowVictory] = useState(false);
     const [showDefeat, setShowDefeat] = useState(false);
     const [showInvalidWord, setShowInvalidWord] = useState(false);
     const targetWordPtrRef = useRef(0);
     const hideInvalidWordTimeoutRef = useRef(0);
+    const runtimeInitDoneRef = useRef(false);
 
     const keyboardState = useMemo(
       () => getKeyboardState(prevFeedback, prevGuesses),
@@ -77,15 +77,44 @@
     );
 
     useEffect(() => {
-      Module.onRuntimeInitialized = function () {
+      function initRuntime() {
+        if (runtimeInitDoneRef.current) {
+          return;
+        }
+        runtimeInitDoneRef.current = true;
         if (targetWordPtrRef.current) {
           Module._freeCString(targetWordPtrRef.current);
         }
         targetWordPtrRef.current = Module._createNewGame();
         setRuntimeReady(true);
+      }
+
+      function canUseModuleExports() {
+        return typeof Module !== "undefined" && typeof Module._createNewGame === "function";
+      }
+
+      if (canUseModuleExports()) {
+        initRuntime();
+      }
+
+      const previousOnRuntimeInitialized = Module.onRuntimeInitialized;
+      Module.onRuntimeInitialized = function () {
+        if (typeof previousOnRuntimeInitialized === "function") {
+          previousOnRuntimeInitialized();
+        }
+        initRuntime();
       };
 
+      // Covers the race where runtime has already initialized before we set the callback.
+      const initPollId = setInterval(function () {
+        if (canUseModuleExports()) {
+          initRuntime();
+          clearInterval(initPollId);
+        }
+      }, 50);
+
       return function () {
+        clearInterval(initPollId);
         if (targetWordPtrRef.current) {
           Module._freeCString(targetWordPtrRef.current);
           targetWordPtrRef.current = 0;
@@ -129,7 +158,7 @@
       return function () {
         document.removeEventListener("keydown", onKeyDown);
       };
-    });
+    }, [runtimeReady, showVictory, showDefeat, currentWord, prevGuesses, prevFeedback, hardMode, wordsSubmitted]);
 
     useEffect(() => {
       if (showInvalidWord) {
@@ -352,19 +381,7 @@
                   }),
                   React.createElement("span", { className: "slider round" })
                 ),
-                React.createElement("span", null, "Impossible Mode"),
-                React.createElement(
-                  "button",
-                  {
-                    className: "info-icon",
-                    type: "button",
-                    onClick: function () {
-                      setShowInfo(true);
-                    },
-                    "aria-label": "Impossible Mode Info"
-                  },
-                  "i"
-                )
+                React.createElement("span", null, "Impossible Mode")
               ),
               React.createElement(
                 "button",
@@ -448,30 +465,6 @@
           )
         )
       ),
-      showInfo &&
-        React.createElement(
-          "div",
-          { id: "info-popup", className: "info-popup-container", style: { display: "flex" } },
-          React.createElement(
-            "div",
-            { className: "popup-content" },
-            React.createElement("h2", null, "Impossible Mode Info"),
-            React.createElement(
-              "p",
-              null,
-              "In Impossible Mode, the game does not pick a single word at the start."
-            ),
-            React.createElement(
-              "button",
-              {
-                onClick: function () {
-                  setShowInfo(false);
-                }
-              },
-              "Close"
-            )
-          )
-        ),
       showVictory &&
         React.createElement(
           "div",
