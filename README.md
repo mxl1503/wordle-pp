@@ -4,7 +4,7 @@ Wordle-PP is an enhanced version of the popular word guessing game Wordle, imple
 
 ## Description
 
-This project is a full-stack implementation of Wordle with an added Impossible/Hard mode (detailed later) for an elevated challenge. The backend is written in C++ for optimal performance and compiled into WebAssembly, allowing it to run efficiently in modern web browsers. The frontend uses React for UI rendering and state management, with CSS for styling.
+This project is a full-stack implementation of Wordle with an added Impossible/Hard mode (detailed later) for an elevated challenge. The backend is written in C++ for optimal performance and compiled into WebAssembly, allowing it to run efficiently in modern web browsers. It also includes a standalone C++ Wordle solver that filters possible solutions from prior guess feedback and recommends a best next guess. The frontend uses React for UI rendering and state management, with CSS for styling.
 
 ## Features
 
@@ -12,8 +12,7 @@ This project is a full-stack implementation of Wordle with an added Impossible/H
 - Backend logic in C++ compiled to WebAssembly for high performance.
 - React-based frontend UI.
 - Cross-browser compatibility.
-- Dynamic difficulty adjustment in Impossible/Hard mode, providing an adaptive challenge based on player guesses.
-- Built-in solver hint system for best-next-guess recommendations.
+- Built-in solver hint system for best next guess recommendations.
 
 ## Project Structure
 
@@ -68,24 +67,6 @@ wordle-pp/
 ### Dependencies
 
 - Docker (required)
-- Docker Compose plugin (usually included with Docker Desktop)
-
-No local Emscripten installation is required.
-
-### Docker Daemon Requirement
-
-If you see `Cannot connect to the Docker daemon` when running `make build`, start Docker Desktop first, then verify Docker is reachable:
-
-```sh
-open -a Docker
-docker version
-```
-
-After `docker version` succeeds, rerun:
-
-```sh
-make build
-```
 
 ### Build with Docker
 
@@ -93,12 +74,6 @@ Compile `cpp-logic/src/wasm_exports.cpp`, `cpp-logic/src/engine.cpp`, and `cpp-s
 
 ```sh
 make build
-```
-
-Equivalent Compose command:
-
-```sh
-docker compose run --rm build
 ```
 
 ### Frontend Architecture
@@ -114,9 +89,6 @@ This keeps the Emscripten integration boundary stable while allowing frontend re
 
 - The frontend hint button calls the `_recommendNextGuess` WASM export.
 - On the backend, the solver filters valid candidates and recommends a next guess.
-- For the initial state (no previous guesses/feedback), the backend returns a fixed opening recommendation:
-  - Best next guess: `ROATE`
-  - Remaining solutions: `2315`
 
 ### Serve Locally with Docker
 
@@ -129,9 +101,6 @@ make serve
 Then open:
 
 - [http://localhost:8080](http://localhost:8080)
-
-Note: `make serve` serves the `frontend/` directory via nginx.
-Note: React is loaded from CDN (`unpkg`) by `frontend/index.html`, so internet access is required unless those scripts are vendored locally.
 
 ### Clean Build Artifacts
 
@@ -149,12 +118,6 @@ em++ -std=c++17 -O3 -Icpp-logic/include -Icpp-solver/include --preload-file cpp-
 
 ### Run C++ Unit Tests (GoogleTest)
 
-Install GoogleTest first (example on macOS):
-
-```sh
-brew install googletest
-```
-
 ```sh
 make test-cpp
 ```
@@ -167,34 +130,6 @@ Run the same C++ tests in Docker (no host GTest required):
 make test-cpp-docker
 ```
 
-### clangd Setup (compile_commands.json)
-
-clangd needs compile flags for this project. Generate `compile_commands.json` at the repo root:
-
-```sh
-make clangd-setup
-```
-
-This runs CMake with `-DCMAKE_EXPORT_COMPILE_COMMANDS=ON` and copies the file from `build/clangd/compile_commands.json` to `./compile_commands.json`, which clangd discovers automatically.
-
-### Formatting and Pre-Commit Hook
-
-This repo uses [`.clang-format`](./.clang-format) for C/C++ formatting.
-
-Install the local git pre-commit hook:
-
-```sh
-make install-hooks
-```
-
-The hook formats staged C/C++ files with `clang-format` and re-stages them before commit.
-
-Check formatting locally:
-
-```sh
-make check-format-cpp
-```
-
 ### Wordlist Utilities
 
 Wordlist utility CLI docs are in:
@@ -203,22 +138,14 @@ Wordlist utility CLI docs are in:
 
 ## Impossible/Hard Mode
 
-The Impossible/Hard mode dynamically adjusts the difficulty of the game. In this mode, the game does not select a single word at the start. Instead, it evaluates the player's guesses against all possible words and provides feedback that is the least informative, making it more challenging to guess the correct word. This mode is designed for players seeking an extra challenge beyond the traditional Wordle gameplay, and while still possible to beat, requires optimal guesses.
+Impossible/Hard mode makes Wordle adversarial:
 
-### How the Algorithm Works:
-- **Dynamic Word Selection**: Rather than sticking to one preselected word, the game evaluates each guess against a list of all possible words.
-- **Feedback Calculation**:
-  - **Filtering Possible Answers**: Using the `filterAnswerList` function, the game filters out words from the answer list that do not match the previous guesses and feedback. This is done by:
-    - Iterating over each word in the answer list.
-    - Comparing the word against each previous guess and its feedback.
-    - Keeping only those words that align with all previous feedback.
-  - **Determining Least Informative Feedback**: The game then uses the `findWorstFeedback` function to find the feedback that reveals the least information about the possible words. This involves:
-    - Comparing the current guess against each word in the filtered answer list.
-    - Counting the frequency of each possible feedback outcome.
-    - Selecting the most common (least informative) feedback to return to the player.
-- **Implementation Details**:
-  - The `makeHardModeGuess` function in the C++ code orchestrates this process, taking in previous guesses and their feedback, along with the current guess.
-  - The algorithm ensures that the player is consistently challenged, making the game engaging and unpredictable.
+- The game does not lock in one target word at the start.
+- After each guess, it keeps every answer still consistent with your past feedback.
+- For your current guess, it returns the feedback pattern that leaves the largest remaining answer set.
+- This means you get the least helpful valid feedback each turn, so solving is harder.
+
+Core implementation lives in `makeHardModeGuess`, using `FilterAnswerList` and `FindWorstFeedback`.
 
 ## Acknowledgements
 
